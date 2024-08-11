@@ -1,5 +1,7 @@
 import { useState } from 'react';
 import './App.css';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faSquareRootVariable } from '@fortawesome/free-solid-svg-icons';
 
 function App() {
   const [currentInput, setCurrentInput] = useState('');
@@ -24,14 +26,14 @@ function App() {
 
   const handleOperationClick = (op) => {
     if (currentInput === '' && op === '-') {
-      // Allow negative numbers
+      // SInnitialised like this, so that that negative numbers can be evaluated
       setCurrentInput('-');
       return;
     }
 
     if (currentInput !== '') {
       if (runningTotal !== null) {
-        // Perform calculation with running total
+        // Performs calculation with running total
         const result = calculateResult(runningTotal, parseFloat(currentInput), operator);
         setRunningTotal(result);
         setCurrentInput('');
@@ -46,11 +48,11 @@ function App() {
         setCurrentInput('');
         setOperator(op);
         setIsResultDisplayed(false);
-        // Update history
+        // Updates history
         setHistory(prevHistory => `${currentInput} ${op}`);
       }
     } else if (operator !== '') {
-      // Change operator if no new input
+      // Change operator if there is no new input
       setOperator(op);
       setHistory(prevHistory => prevHistory.slice(0, -1) + op); // Update the last operator in history
     }
@@ -67,7 +69,7 @@ function App() {
       case '/':
         return num2 === 0 ? 'Error' : num1 / num2;
       case '%':
-        return (num1 * num2) / 100;
+        return num1 * (num2 / 100); // Handle percentage
       default:
         return num1;
     }
@@ -82,7 +84,7 @@ function App() {
     setPreviousInput('');
     setOperator('');
     setIsResultDisplayed(true);
-    // Append result to history with new line
+    // Append result to history with a new line
     setHistory(prevHistory => `${prevHistory} ${currentInput} = ${result}\n`);
   };
 
@@ -103,6 +105,30 @@ function App() {
     if (!currentInput.includes('.')) {
       setCurrentInput(currentInput + '.');
     }
+  };
+
+  const handleSpecialOperation = (op) => {
+    let result = parseFloat(currentInput);
+
+    switch (op) {
+      case '1/x':
+        result = 1 / result;
+        break;
+      case 'x²':
+        result = result * result;
+        break;
+      case '√':
+        result = Math.sqrt(result);
+        break;
+      default:
+        return;
+    }
+
+    setRunningTotal(result);
+    setCurrentInput(result.toString());
+    setIsResultDisplayed(true);
+    // Append result to history and breaks to new line
+    setHistory(prevHistory => `${prevHistory} ${op}(${currentInput}) = ${result}\n`);
   };
 
   // Helper function to get the last two lines from the history
@@ -148,9 +174,9 @@ function App() {
         <button className="single-button" onClick={handleDelClick}>Del</button>
       </div>
       <div className="calculator-row">
-        <button className="single-button">1/x</button>
-        <button className="single-button">x²</button>
-        <button className="single-button">√</button>
+        <button className="single-button" onClick={() => handleSpecialOperation('1/x')}>1/x</button>
+        <button className="single-button" onClick={() => handleSpecialOperation('x²')}>x²</button>
+        <button className="single-button" onClick={() => handleSpecialOperation('√')}> <FontAwesomeIcon icon={faSquareRootVariable} /></button>
         <button className="single-button" onClick={() => handleOperationClick('/')}>/</button>
       </div>
       <div className="calculator-row">
