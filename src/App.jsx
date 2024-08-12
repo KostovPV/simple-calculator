@@ -134,7 +134,7 @@ function App() {
     const value = parseFloat(currentInput);
     let result;
     let historyEntry;
-  
+
     switch (operation) {
       case '1/x':
         result = value ? (1 / value) : 'Error';
@@ -162,8 +162,8 @@ function App() {
         historyEntry = '';
     }
   };
-  
-  
+
+
 
   const getLastTwoRows = (history) => {
     const rows = history.trim().split('\n').filter(row => row !== '');
@@ -172,9 +172,15 @@ function App() {
 
   return (
     <section className="calculator-container">
+      <div className="header-bar">
+      <div className="icon-bar">
+        <img src="/favicon.png" alt="" />
+      </div>
       <div className="name-bar">
         <div className="menu">Calculator</div>
       </div>
+      </div>
+     
 
       <div className="top-bar">
         <div className="menu">Standard </div>
