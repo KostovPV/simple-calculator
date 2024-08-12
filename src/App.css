@@ -5,7 +5,7 @@
   text-align: center;
 }
 
-.calculator-container{
+.calculator-container {
   width: 320px;
   height: 600px;
   display: flex;
@@ -14,19 +14,22 @@
   border: 1px solid rgb(83, 79, 72);
   border-radius: 10px;
 }
-.name-bar{
+
+.name-bar {
   width: 100%;
   background-color: #3b3b3b;
   border-top-left-radius: 10px;
   border-top-right-radius: 10px;
 }
-.top-bar{
+
+.top-bar {
   display: flex;
   justify-content: space-between;
   width: 90%;
-  
+
 }
-.display{
+
+.display {
   width: 80%;
   height: 140px;
   display: flex;
@@ -34,25 +37,30 @@
   align-items: flex-end;
   justify-content: center;
 }
-.history{
+
+.history {
   height: 30%;
 }
+
 .history {
-  white-space: pre-wrap; /* Ensures that newline characters are respected */
-  overflow-wrap: break-word; /* Allows long lines to be broken and wrapped */
+  white-space: pre-wrap;
+  /* Ensures that newline characters are respected */
+  overflow-wrap: break-word;
+  /* Allows long lines to be broken and wrapped */
 }
 
-.result{
-  font-size:45px;
+.result {
+  font-size: 45px;
 }
-.calculator-top-row{
+
+.calculator-top-row {
   display: flex;
   align-items: center;
   justify-items: center;
-  
+
 }
 
-.single-button{
+.single-button {
   width: 75px;
   height: 55px;
   margin: 2px;
@@ -60,15 +68,27 @@
   border: none;
 
 }
+
+.calculator-top-row .single-button {
+  background-color: transparent;
+  width: 35px;
+  height: 25px;
+  border-radius: 7px;
+  border: none; 
+  cursor: pointer;
+}
+
+/* Add a white border when the div is pressed */
+.calculator-top-row .single-button:active {
+  border: 2px solid white;
+}
+
 .single-button:hover {
   background-color: #323232;
 }
 
-.top-button{
-  width: 45px;
-  height: 25px;
-  margin: 0px;
-  border: none;
-  font-size: 16px;
-  margin-bottom: 2px;
+
+.single-button:hover {
+  background-color: #323232;
 }
+

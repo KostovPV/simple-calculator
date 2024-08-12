@@ -2,6 +2,8 @@ import { useState } from 'react';
 import './App.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSquareRootVariable } from '@fortawesome/free-solid-svg-icons';
+import { faClockRotateLeft } from '@fortawesome/free-solid-svg-icons';
+
 
 function App() {
   const [currentInput, setCurrentInput] = useState('');
@@ -10,10 +12,10 @@ function App() {
   const [runningTotal, setRunningTotal] = useState(null);
   const [isResultDisplayed, setIsResultDisplayed] = useState(false);
   const [history, setHistory] = useState('');
+  const [memory, setMemory] = useState(0);
 
   const handleNumberClick = (value) => {
     if (isResultDisplayed) {
-      // Reset state after result is displayed
       setPreviousInput('');
       setOperator('');
       setRunningTotal(null);
@@ -26,35 +28,29 @@ function App() {
 
   const handleOperationClick = (op) => {
     if (currentInput === '' && op === '-') {
-      // SInnitialised like this, so that that negative numbers can be evaluated
       setCurrentInput('-');
       return;
     }
 
     if (currentInput !== '') {
       if (runningTotal !== null) {
-        // Performs calculation with running total
         const result = calculateResult(runningTotal, parseFloat(currentInput), operator);
         setRunningTotal(result);
         setCurrentInput('');
         setOperator(op);
         setIsResultDisplayed(false);
-        // Update history
         setHistory(prevHistory => `${prevHistory} ${currentInput} ${op}`);
       } else {
-        // Initialize running total
         setRunningTotal(parseFloat(currentInput));
         setPreviousInput(currentInput);
         setCurrentInput('');
         setOperator(op);
         setIsResultDisplayed(false);
-        // Updates history
         setHistory(prevHistory => `${currentInput} ${op}`);
       }
     } else if (operator !== '') {
-      // Change operator if there is no new input
       setOperator(op);
-      setHistory(prevHistory => prevHistory.slice(0, -1) + op); // Update the last operator in history
+      setHistory(prevHistory => prevHistory.slice(0, -1) + op);
     }
   };
 
@@ -69,7 +65,7 @@ function App() {
       case '/':
         return num2 === 0 ? 'Error' : num1 / num2;
       case '%':
-        return num1 * (num2 / 100); // Handle percentage
+        return num1 * (num2 / 100);
       default:
         return num1;
     }
@@ -84,7 +80,6 @@ function App() {
     setPreviousInput('');
     setOperator('');
     setIsResultDisplayed(true);
-    // Append result to history with a new line
     setHistory(prevHistory => `${prevHistory} ${currentInput} = ${result}\n`);
   };
 
@@ -107,31 +102,69 @@ function App() {
     }
   };
 
-  const handleSpecialOperation = (op) => {
-    let result = parseFloat(currentInput);
-
-    switch (op) {
-      case '1/x':
-        result = 1 / result;
-        break;
-      case 'x²':
-        result = result * result;
-        break;
-      case '√':
-        result = Math.sqrt(result);
-        break;
-      default:
-        return;
-    }
-
-    setRunningTotal(result);
-    setCurrentInput(result.toString());
-    setIsResultDisplayed(true);
-    // Append result to history and breaks to new line
-    setHistory(prevHistory => `${prevHistory} ${op}(${currentInput}) = ${result}\n`);
+  const handleMemoryClear = () => {
+    setMemory(0);
   };
 
-  // Helper function to get the last two lines from the history
+  const handleMemoryRecall = () => {
+    setCurrentInput(memory.toString());
+    setIsResultDisplayed(false);
+  };
+
+  const handleMemoryAdd = () => {
+    const currentValue = parseFloat(currentInput || '0');
+    setMemory(memory + currentValue);
+    setIsResultDisplayed(false);
+  };
+
+  const handleMemorySubtract = () => {
+    const currentValue = parseFloat(currentInput || '0');
+    setMemory(memory - currentValue);
+    setIsResultDisplayed(false);
+  };
+
+  const handleMemoryStore = () => {
+    if (currentInput) {
+      setMemory(parseFloat(currentInput));
+      setIsResultDisplayed(false);
+    }
+  };
+
+  const handleSpecialOperation = (operation) => {
+    const value = parseFloat(currentInput);
+    let result;
+    let historyEntry;
+  
+    switch (operation) {
+      case '1/x':
+        result = value ? (1 / value) : 'Error';
+        setCurrentInput(result.toString());
+        setIsResultDisplayed(true);
+        historyEntry = `1/${value}`;
+        setHistory(prevHistory => `${prevHistory} (${historyEntry})`);
+        break;
+      case 'x²':
+        result = value * value;
+        historyEntry = `${value}²`;
+        setCurrentInput(result.toString());
+        setIsResultDisplayed(true);
+        setHistory(prevHistory => `${prevHistory} (${historyEntry})`);
+        break;
+      case '√':
+        result = value >= 0 ? Math.sqrt(value) : 'Error';
+        setCurrentInput(result.toString());
+        setIsResultDisplayed(true);
+        historyEntry = `${value}`;
+        setHistory(prevHistory => `${prevHistory} (√${historyEntry})`);
+        break;
+      default:
+        result = '';
+        historyEntry = '';
+    }
+  };
+  
+  
+
   const getLastTwoRows = (history) => {
     const rows = history.trim().split('\n').filter(row => row !== '');
     return rows.slice(-2).join('\n');
@@ -144,8 +177,8 @@ function App() {
       </div>
 
       <div className="top-bar">
-        <div className="menu">Menu</div>
-        <div className="record">Record</div>
+        <div className="menu">Standard </div>
+        <div className="record"><FontAwesomeIcon icon={faClockRotateLeft} /></div>
       </div>
 
       {/* Display */}
@@ -154,17 +187,16 @@ function App() {
           {getLastTwoRows(history)}
         </div>
         <div className="result">
-          {isResultDisplayed ? (runningTotal !== null ? runningTotal : '') : (currentInput !== '' ? currentInput : '')}
+          {currentInput}
         </div>
       </div>
 
       <div className="calculator-top-row">
-        <div className="top-button">MC</div>
-        <div className="top-button">CE</div>
-        <div className="top-button">M+</div>
-        <div className="top-button">M-</div>
-        <div className="top-button">MS</div>
-        <div className="top-button">M^</div>
+        <div className="single-button" onClick={handleMemoryClear}>MC</div>
+        <div className="single-button" onClick={handleMemoryRecall}>MR</div>
+        <div className="single-button" onClick={handleMemoryAdd}>M+</div>
+        <div className="single-button" onClick={handleMemorySubtract}>M-</div>
+        <div className="single-button" onClick={handleMemoryStore}>MS</div>
       </div>
 
       <div className="calculator-row">
@@ -176,7 +208,7 @@ function App() {
       <div className="calculator-row">
         <button className="single-button" onClick={() => handleSpecialOperation('1/x')}>1/x</button>
         <button className="single-button" onClick={() => handleSpecialOperation('x²')}>x²</button>
-        <button className="single-button" onClick={() => handleSpecialOperation('√')}> <FontAwesomeIcon icon={faSquareRootVariable} /></button>
+        <button className="single-button" onClick={() => handleSpecialOperation('√')}><FontAwesomeIcon icon={faSquareRootVariable} /></button>
         <button className="single-button" onClick={() => handleOperationClick('/')}>/</button>
       </div>
       <div className="calculator-row">
